@@ -72,7 +72,7 @@ def get_transcripts(wave_form,processor,model):
     audio_np = mono_waveform.numpy()
 
     # Define segment length in seconds (Whisper model typically uses 30 seconds)
-    segment_length_seconds = 60
+    segment_length_seconds = 30
     segment_length_samples = segment_length_seconds * SAMPLING_RATE
 
     full_transcription = []
