@@ -46,8 +46,7 @@ if st.button("Transcribe Video"):
         with st.spinner('Getting Audio'):
             audio=get_audio(video_path)
         st.success('Audio is extracted successfully!')
-        audio_path='audio.mp3'
-        wave_form=preprocess_audio(audio_path,SAMPLING_RATE)
+        wave_form=preprocess_audio(audio,SAMPLING_RATE)
         st.session_state.wave_form=wave_form
         #print(wave_form)
 
