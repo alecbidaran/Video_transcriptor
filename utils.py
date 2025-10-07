@@ -1,4 +1,3 @@
-import yt_dlp
 import torch
 import torchaudio
 from transformers import AutoProcessor, AutoModelForSpeechSeq2Seq
