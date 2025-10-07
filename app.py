@@ -7,11 +7,11 @@ st.markdown(
     /* Make audio controls wider and a bit taller */
     audio {
         width: 100% !important;
-        height: 56px !important; /* increase control height */
+        height: 36px !important; /* increase control height */
     }
     /* Ensure Streamlit's audio container uses more vertical space */
     .stAudio > audio {
-        height: 56px !important;
+        height: 36px !important;
     }
     </style>
     """,
@@ -46,7 +46,8 @@ if st.button("Transcribe Video"):
         with st.spinner('Getting Audio'):
             audio=get_audio(video_path)
         st.success('Audio is extracted successfully!')
-        wave_form=preprocess_audio(audio,SAMPLING_RATE)
+        audio_path='audio.mp3'
+        wave_form=preprocess_audio(audio_path,SAMPLING_RATE)
         st.session_state.wave_form=wave_form
         #print(wave_form)
 
@@ -74,7 +75,7 @@ if st.button("Transcribe Video"):
                         raw_text = " ".join([str(x) for x in t])
                     else:
                         raw_text = str(t)
-                cols = st.columns([1, 3])
+                cols = st.columns([2, 3])
                 with cols[0]:
                     st.markdown(f"**Segment {idx+1}**")
                     # ensure numpy array is 1-D for st.audio
@@ -90,25 +91,3 @@ if st.button("Transcribe Video"):
                 with cols[1]:
                     st.markdown("**Transcript**")
                     st.write(raw_text)
-# ...existing code...
-
-
-
-    
-    # Asynchronously transcribe the video
-    # async def main():
-    #     # Download and preprocess the video
-    #     video_path = "temp_video"
-    #     audio=get_audio(video_path)
-    #     waveform = preprocess_audio(audio, SAMPLING_RATE)
-
-    #     # Transcribe the audio
-    #     transcription = transcribe_video(waveform)
-
-    #     return transcription
-
-    # if st.button("Transcribe Video"):
-    #     with st.spinner("Transcribing..."):
-    #         transcription = asyncio.run(main())
-    #         st.success("Transcription completed!")
-    #         st.text_area("Transcription", value=transcription['Final_transcript'], height=300)
