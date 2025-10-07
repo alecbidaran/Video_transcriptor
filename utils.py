@@ -18,16 +18,29 @@ SAMPLING_RATE = 16000
 
 def get_audio(video_path, out_path="audio.mp3", bitrate="192k"):
     """
-    Extract audio using ffmpeg via ffmpy (requires ffmpeg binary in PATH).
+    Extract audio using ffmpeg binary. Prefer system ffmpeg; if not found,
+    fall back to the ffmpeg binary provided by imageio-ffmpeg (pip).
     Produces a 16 kHz mono MP3 and returns the path.
     """
-    # Ensure ffmpeg binary is available
-    if shutil.which("ffmpeg") is None:
-        raise RuntimeError("ffmpeg not found in PATH. Install ffmpeg (e.g., choco install ffmpeg).")
+    # Try system ffmpeg first
+    ffmpeg_exe = shutil.which("ffmpeg")
+    if ffmpeg_exe is None:
+        # fallback to imageio-ffmpeg (install via requirements: imageio-ffmpeg)
+        try:
+            from imageio_ffmpeg import get_ffmpeg_exe
+            ffmpeg_exe = get_ffmpeg_exe()
+        except Exception:
+            raise RuntimeError(
+                "ffmpeg binary not found. Add 'ffmpeg' to packages.txt (repo root) or add "
+                "'imageio-ffmpeg' to requirements.txt so a binary is available."
+            )
 
-    outputs = {out_path: f"-y -vn -ac 1 -ar {SAMPLING_RATE} -b:a {bitrate}"}
-    ff = FFmpeg(inputs={video_path: None}, outputs=outputs)
-    ff.run(stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+    cmd = [
+        ffmpeg_exe, "-y", "-i", video_path,
+        "-vn", "-ac", "1", "-ar", str(SAMPLING_RATE),
+        "-b:a", bitrate, out_path
+    ]
+    subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
     return out_path
 
 def preprocess_audio(audio_path,target_sampling_rate):
