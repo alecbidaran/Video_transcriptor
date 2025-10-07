@@ -43,7 +43,7 @@ def preprocess_audio(audio_path,target_sampling_rate):
 def load_model():
     MODEL_NAME="openai/whisper-tiny"
     processor = AutoProcessor.from_pretrained(MODEL_NAME)
-    model = AutoModelForSpeechSeq2Seq.from_pretrained(MODEL_NAME).to('cuda')
+    model = AutoModelForSpeechSeq2Seq.from_pretrained(MODEL_NAME).to('cpu')
     return model,processor
 
 def get_transcripts(wave_form,processor,model):
@@ -67,7 +67,7 @@ def get_transcripts(wave_form,processor,model):
         segment = audio_np[i:i + segment_length_samples]
         segments.append(segment)
         # Process the segment using the processor and model
-        input_features = processor(segment, return_tensors="pt", sampling_rate=SAMPLING_RATE).input_features.to('cuda')
+        input_features = processor(segment, return_tensors="pt", sampling_rate=SAMPLING_RATE).input_features.to('cpu')
         predicted_ids = model.generate(input_features)
         segment_transcription = processor.batch_decode(predicted_ids, skip_special_tokens=True)
 
