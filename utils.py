@@ -16,29 +16,32 @@ SAMPLING_RATE = 16000
 #         error_code = ydl.download(URLS)
 
 
-def get_audio(video_path, out_path="audio.mp3", bitrate="192k"):
+def get_audio(video_path, out_path="audio.wav", bitrate="192k"):
     """
-    Extract audio using ffmpeg binary. Prefer system ffmpeg; if not found,
-    fall back to the ffmpeg binary provided by imageio-ffmpeg (pip).
-    Produces a 16 kHz mono MP3 and returns the path.
+    Extract audio using ffmpeg binary (prefers system ffmpeg, falls back to imageio-ffmpeg).
+    Produces a 16 kHz mono PCM16 WAV (works with torchaudio without ffmpeg backend).
+    Returns the path to the WAV file.
     """
     # Try system ffmpeg first
     ffmpeg_exe = shutil.which("ffmpeg")
     if ffmpeg_exe is None:
-        # fallback to imageio-ffmpeg (install via requirements: imageio-ffmpeg)
         try:
             from imageio_ffmpeg import get_ffmpeg_exe
             ffmpeg_exe = get_ffmpeg_exe()
         except Exception:
             raise RuntimeError(
-                "ffmpeg binary not found. Add 'ffmpeg' to packages.txt (repo root) or add "
-                "'imageio-ffmpeg' to requirements.txt so a binary is available."
+                "ffmpeg binary not found. Add 'ffmpeg' to packages.txt (repo root) or "
+                "add 'imageio-ffmpeg' to requirements.txt so a binary is available."
             )
 
     cmd = [
         ffmpeg_exe, "-y", "-i", video_path,
-        "-vn", "-ac", "1", "-ar", str(SAMPLING_RATE),
-        "-b:a", bitrate, out_path
+        "-vn",               # no video
+        "-ac", "1",          # mono
+        "-ar", str(SAMPLING_RATE),  # sample rate
+        "-f", "wav",         # output format WAV
+        "-acodec", "pcm_s16le",
+        out_path
     ]
     subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
     return out_path
